@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const qs = require('qs');
 
 const Product = require('./schema/product');
 const Category = require('./schema/category');
@@ -8,10 +9,18 @@ const Review = require('./schema/review');
 const router = express.Router({ mergeParams: true });
 
 router.get('/products', async (req, res) => {
-    const query = req.query || {};
+    const query = {};
+    const reqQuery = qs.parse(req.query);
+
+    if(reqQuery.categoryId && Array.isArray(reqQuery.categoryId)) {
+        query.categoryId = {
+            $in: reqQuery.categoryId.map(id => mongoose.mongo.ObjectId(id))
+        }
+    }
+
     const result = await Product.find(query);
 
-    res.json(result);
+    return res.json(result);
 });
 
 router.get('/products/:id', async (req, res) => {
@@ -25,13 +34,6 @@ router.get('/categories', async (req, res) => {
     const result = await Category.find(query);
 
     res.json(result);
-});
-
-router.get('/categories/:name', async (req, res) => {
-    const category = await Category.findOne( { name: req.params.name });
-    const result = await Product.find({ categoryId: category._id });
-
-    return res.json(result)
 });
 
 router.get('/products/:id/reviews', async (req, res) => {
