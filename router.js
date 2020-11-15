@@ -17,11 +17,26 @@ router.get('/products', async (req, res) => {
             $in: reqQuery.categoryId.map(id => mongoose.mongo.ObjectId(id))
         }
     }
-    console.log(reqQuery.limit, reqQuery.skip, query)
+
     const result = await Product
         .find(query)
         .limit( parseInt(reqQuery.limit, 10) )
         .skip(parseInt(reqQuery.skip, 10));
+
+    return res.json(result);
+});
+
+router.get('/products/count', async (req, res) => {
+    const query = {};
+    const reqQuery = qs.parse(req.query);
+
+    if(reqQuery.categoryId && Array.isArray(reqQuery.categoryId)) {
+        query.categoryId = {
+            $in: reqQuery.categoryId.map(id => mongoose.mongo.ObjectId(id))
+        }
+    }
+
+    const result = await Product.countDocuments(query);
 
     return res.json(result);
 });
@@ -35,7 +50,7 @@ router.get('/products/:id', async (req, res) => {
 router.get('/categories', async (req, res) => {
     const query = req.query || {};
     const result = await Category.find(query);
-    console.log(req.query, '==================')
+
     res.json(result);
 });
 
