@@ -6,7 +6,7 @@ const Product = require('./schema/product');
 const Category = require('./schema/category');
 const Review = require('./schema/review');
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true });  
 
 router.get('/products', async (req, res) => {
     const query = {};
@@ -17,8 +17,11 @@ router.get('/products', async (req, res) => {
             $in: reqQuery.categoryId.map(id => mongoose.mongo.ObjectId(id))
         }
     }
-
-    const result = await Product.find(query);
+    console.log(reqQuery.limit, reqQuery.skip, query)
+    const result = await Product
+        .find(query)
+        .limit( parseInt(reqQuery.limit, 10) )
+        .skip(parseInt(reqQuery.skip, 10));
 
     return res.json(result);
 });
@@ -32,7 +35,7 @@ router.get('/products/:id', async (req, res) => {
 router.get('/categories', async (req, res) => {
     const query = req.query || {};
     const result = await Category.find(query);
-
+    console.log(req.query, '==================')
     res.json(result);
 });
 
