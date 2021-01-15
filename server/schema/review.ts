@@ -1,6 +1,6 @@
-const { model, mongo, Schema } = require('mongoose');
+import { model, Schema, mongo } from 'mongoose';
 
-const schema = Schema({
+const schema = new Schema({
     title : String,
     description : String,
     evaluation : Number,
@@ -8,4 +8,4 @@ const schema = Schema({
     productId : mongo.ObjectId
 }, { collection : 'review' });
 
-module.exports = model('Review', schema);
+export default model('Review', schema);
