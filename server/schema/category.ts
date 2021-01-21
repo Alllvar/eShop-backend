@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
 
-const schema = new Schema({ name : String });
+const schema = new Schema({ name: String });
 
 export default model('Category', schema);

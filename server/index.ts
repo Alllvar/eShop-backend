@@ -14,7 +14,7 @@ app.use(cors());
 app.use('/', router);
 
 app.listen(process.env.SERVER_PORT, async () => {
-    console.log('Example app listening at 8081');
-    await mongoose.connect('mongodb://localhost/eshop', { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log('connected to db');
+  console.log('Example app listening at 8081');
+  await mongoose.connect('mongodb://localhost/eshop', { useNewUrlParser: true, useUnifiedTopology: true });
+  console.log('connected to db');
 });
