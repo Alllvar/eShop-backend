@@ -53,7 +53,8 @@ router.get('/products/:id', async (request: Request, response: Response) => {
 
 router.get('/products/:id/reviews', async (request: Request, response: Response) => {
     const query: MongoQuery<IReview> = { productId: new mongoose.mongo.ObjectId(request.params.id) };
-    const result = await Review.findOne(query);
+    const result = await Review.find(query);
+    console.log(result)
 
     return response.json(result);
 });
