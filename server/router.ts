@@ -12,26 +12,37 @@ const router: Router = express.Router({ mergeParams: true });
 router.get('/products', async (request: Request, response: Response) => {
     const query: MongoQuery<IProduct> = {};
     const reqQuery = request.query;
-    const { categoryId, limit, skip } = reqQuery;
+    const { categoryId, limit, skip, priceFrom, priceTo } = reqQuery;
 
     if (categoryId && Array.isArray(categoryId)) {
         query.categoryId = {
-            $in: (categoryId as string[]).map((id: string) => new mongoose.mongo.ObjectId(id))
-        };
+            $in: (categoryId as string[]).map((id: string) => new mongoose.mongo.ObjectId(id)),
+        }
+    }
+
+    if (priceFrom || priceTo) {
+        query.price = {};
+
+        if (priceFrom) {
+            query.price.$gt = parseInt(priceFrom as string, 10)
+        }
+
+        if (priceTo) {
+            query.price.$lt = parseInt(priceTo as string, 10)
+        }
     }
 
     const result = await Product
         .find(query)
         .limit(parseInt(limit as string, 10))
         .skip(parseInt(skip as string, 10));
-
     return response.json(result);
 });
 
 router.get('/products/count', async (request: Request, response: Response) => {
     const query: MongoQuery<IProduct> = {};
     const reqQuery = request.query;
-    const { categoryId } = reqQuery;
+    const { categoryId, priceFrom, priceTo } = reqQuery;
 
     if (reqQuery.categoryId && Array.isArray(reqQuery.categoryId)) {
         query.categoryId = {
@@ -39,8 +50,19 @@ router.get('/products/count', async (request: Request, response: Response) => {
         };
     }
 
-    const result = await Product.countDocuments(query);
+    if (priceFrom || priceTo) {
+        query.price = {};
 
+        if (priceFrom) {
+            query.price.$gt = parseInt(priceFrom as string, 10)
+        }
+
+        if (priceTo) {
+            query.price.$lt = parseInt(priceTo as string, 10)
+        }
+    }
+
+    const result = await Product.countDocuments(query);
     return response.json(result);
 });
 
