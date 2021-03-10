@@ -12,7 +12,7 @@ const router: Router = express.Router({ mergeParams: true });
 router.get('/products', async (request: Request, response: Response) => {
     const query: MongoQuery<IProduct> = {};
     const reqQuery = request.query;
-    const { categoryId, limit, skip, priceFrom, priceTo } = reqQuery;
+    const { categoryId, limit, skip, priceFrom, priceTo, sortBy = 'name', sortDirection = 'asc' } = reqQuery;
 
     if (categoryId && Array.isArray(categoryId)) {
         query.categoryId = {
@@ -35,7 +35,9 @@ router.get('/products', async (request: Request, response: Response) => {
     const result = await Product
         .find(query)
         .limit(parseInt(limit as string, 10))
-        .skip(parseInt(skip as string, 10));
+        .skip(parseInt(skip as string, 10))
+        .collation({ locale: "en" })
+        .sort({ [sortBy as string]: sortDirection === 'desc' ? -1 : 1 })
     return response.json(result);
 });
 
